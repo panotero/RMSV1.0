@@ -33,6 +33,7 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
         'safe.text' => \App\Http\Middleware\SafeText::class,
+        'permission' => \App\Http\Middleware\EnsurePermission::class,
     ];
 
     /**

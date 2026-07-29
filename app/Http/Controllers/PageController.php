@@ -41,6 +41,10 @@ class PageController extends Controller
     {
         return view('pages.settings.users');
     }
+    public function page_TeamManagement()
+    {
+        return view('pages.settings.team_management');
+    }
     public function page_Forms()
     {
         return view('pages.settings.forms');

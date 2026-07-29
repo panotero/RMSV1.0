@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserStatus extends Model
+class UserDepartment extends Model
 {
     protected $casts = [
         'created_at' => 'datetime:M d, Y, h:i A',
@@ -13,10 +13,10 @@ class UserStatus extends Model
     ];
 
     use HasFactory;
-    protected $table = 'user_status';
+    protected $table = 'user_department';
     protected $fillable = [
         'name',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 }

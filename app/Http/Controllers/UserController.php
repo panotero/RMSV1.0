@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Office;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -204,5 +203,18 @@ class UserController extends Controller
             'departments' => UserDepartment::all(),
             'statuses' => UserStatus::all(),
         ];
+    }
+
+    public function counts()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'total'    => (int) User::count(),
+                'active'   => (int) User::where('status', User::STATUS_ACTIVE)->count(),
+                'inactive' => (int) User::where('status', User::STATUS_INACTIVE)->count(),
+                'roles'    => (int) SettingRole::count(),
+            ],
+        ]);
     }
 }

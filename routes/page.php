@@ -7,6 +7,7 @@ Route::get('/page_dashboard', [PageController::class, 'page_dashboard']);
 Route::get('/page_usermanagement', [PageController::class, 'page_UserManagement']);
 Route::get('/page_menus', [PageController::class, 'page_Menus']);
 Route::get('/page_users', [PageController::class, 'page_Users']);
+Route::get('/page_team_management', [PageController::class, 'page_TeamManagement']);
 Route::get('/page_settings', [PageController::class, 'page_settings']);
 Route::get('/page_maintenance', [PageController::class, 'page_maintenance']);
 Route::get('/page_bookings', [PageController::class, 'page_bookings']);
