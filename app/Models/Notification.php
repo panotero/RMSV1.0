@@ -8,45 +8,42 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     use HasFactory;
+
     protected $table = 'notifications';
 
-    protected $primaryKey = 'id';
-
     protected $fillable = [
-        'office_origin',
-        'destination_office',
-        'routed_to',
-        'document_id',
+        'type',
+        'notifiable_type',
+        'notifiable_id',
         'user_id',
         'from_user_id',
+        'title',
         'message',
+        'link_title',
+        'link_url',
+        'data',
         'is_read',
     ];
 
     protected $casts = [
+        'created_at' => 'datetime:M d, Y, h:i A',
+        'updated_at' => 'datetime:M d, Y, h:i A',
+        'data' => 'array',
         'is_read' => 'boolean',
-        'routed_to' => 'integer',
-        'document_id' => 'integer',
         'user_id' => 'integer',
+        'from_user_id' => 'integer',
     ];
 
-    public function document()
+    public function notifiable()
     {
-        return $this->belongsTo(Document::class, 'document_id');
+        return $this->morphTo();
     }
-
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-
-    public function approvals()
-    {
-
-        return $this->belongsTo(Approvals::class, 'document_id', 'document_id');
-    }
     public function sender()
     {
         return $this->belongsTo(User::class, 'from_user_id');

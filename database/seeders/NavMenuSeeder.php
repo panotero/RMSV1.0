@@ -74,6 +74,14 @@ class NavMenuSeeder extends Seeder
                 'parent_title' => 'Developer Option',
                 'menu_order' => '2',
             ],
+            [
+                'title' => 'Notification Test',
+                'icon' => 'bell',
+                'link' => '/page_notification_test',
+                'allowed_roles' => ['1'],
+                'parent_title' => 'Developer Option',
+                'menu_order' => '3',
+            ],
         ];
 
         foreach ($menu_array as $menu) {

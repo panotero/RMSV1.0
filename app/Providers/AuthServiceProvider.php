@@ -5,6 +5,7 @@ namespace App\Providers;
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use App\Support\RoleHelper;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -26,7 +27,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('isSuperAdmin', function ($user) {
-            return $user->role_name === 'superadmin'; // Adjust field as per your DB
+            return RoleHelper::roleName($user) === 'superadmin';
         });
     }
 }

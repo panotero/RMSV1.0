@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Laravel 10 admin template/starter kit, currently being extended into a freight-forwarding/logistics operations app (bookings, contracts, CRM, proposals, tariffs). The README describes it as a "Document Tracking & Finance Management System," but that is aspirational/downstream branding — the code in this repo is the reusable admin scaffold underneath it.
+Laravel 10 admin template/starter kit. This is a clean, reusable base — no specific product domain has been decided yet. Treat it as a foundation for whatever application gets built on top of it, not as evidence of a particular direction.
 
 ## Commands
 
@@ -32,22 +32,23 @@ There is no configured linter/formatter script in `composer.json`/`package.json`
 
 **Routing**: `RouteServiceProvider` loads only `routes/web.php` (web middleware) and `routes/api.php` (api middleware, `/api` prefix). Other route files are pulled in via `require`, not independently registered:
 - `web.php` requires `page.php` (Blade page routes) and `mailer.php`
-- `api.php` requires `api_maintenance.php`
-- `api_booking.php`, `api_contracts.php`, `api_master.php` exist on disk but are **not required anywhere** — dead/orphaned route files.
 
-**Known broken state — logistics domain is scaffolded but not implemented**: `routes/api_maintenance.php` (which *is* loaded on every request via `api.php`) references controllers that do not exist in `app/Http/Controllers` (`PortController`, `BookingController`, `ContractController`, `LaneController`, `ContainerController`, `ChargeTypeController`, `VatRateController`, etc.), and there are no corresponding models or migrations (ports, lanes, tariffs, bookings, contracts, containers). Hitting any `/api/*` route currently throws a class-not-found error. `PageController` similarly has view-only stub methods (`page_bookings`, `page_contracts`, `page_crm`, `page_proposals`, `page_maintenance`, etc.) that just render Blade pages with no backing data layer yet. `web.php` also imports `ProfileController` and `ProposalController`, neither of which exist. Before "fixing" a bug in this area, check whether the feature has actually been built yet — much of the logistics domain (ports/lanes/tariffs/bookings/contracts/containers) is route-level scaffolding only.
+Every route in `page.php` and `api.php` currently resolves to a real controller method with a real backing view (or JSON response) — there is no dead scaffolding left in the routing layer. `PageController::page_Themes()` renders a real view (`pages.settings.theme`) but isn't wired to a route yet; it's a half-built settings page, not orphaned scaffolding — leave it alone unless you're picking that feature up.
 
 **What is actually implemented** (the reusable admin-template core):
 - Auth (Laravel Breeze-based) — `app/Http/Controllers/Auth/*`, `routes/auth.php`
-- Users & roles — `UserController`, `RoleController`, `User` model (role via `role_id` → `SettingRole`), gate `isSuperAdmin` defined in `AuthServiceProvider` checks `$user->role_name === 'superadmin'`
-- Dynamic nav menu system — `NavMenu` model (`nav_menus` table: title, icon, link, `allowed_roles`, `allowed_office`, `parent_menu`, `menu_order`), `MenusController`, `Api/MenuController`, driven client-side by `resources/js/navmenu.js`
-- Notifications — `NotificationController`, streaming endpoint at `/api/notifications/stream`
-- Dynamic mailer — `MailerSetting` model, `DynamicMailerService`/`ApplicationMailer`, admin-configurable SMTP settings instead of static `.env` mail config
+- Users & roles — `UserController`, `RolesController`, `User` model (role via `role_id` → `SettingRole`), gate `isSuperAdmin` defined in `AuthServiceProvider` checks `$user->role_name === 'superadmin'`; permission-based middleware also available (`EnsurePermission`, `Permission` model)
+- Teams — `TeamController`, `Team` model
+- Dynamic nav menu system — `NavMenu` model (`nav_menus` table: title, icon, link, `allowed_roles`, `allowed_office`, `parent_menu`, `menu_order`), `MenusController`, `NavIconController`, driven client-side by `resources/js/navmenu.js`
+- Notifications — polymorphic, targetable by user/role/department. `Notification` model + `notifications` migration, `NotificationService::send()` (targeting/insert logic), `TeamNotifier` (notification + queued email pair for team-leader flows), `NotificationController` (`index` cursor-paginated list, `unreadCount`, `markRead`, superadmin-only `testSend`), polled client-side via `resources/js/notificationController.js` (`window.initNotifications`, called from `navmenu.js`) against `/api/notifications*`. Bell UI lives in `resources/views/layouts/partials/notification-bell.blade.php`. A dev-only `/page_notification_test` page (superadmin-gated) exercises all three target modes.
+- Dynamic mailer — `MailerSetting` model, `MailerController`, admin-configurable SMTP settings instead of static `.env` mail config
 
 **Middleware of note** (`app/Http/Kernel.php` aliases):
 - `check.status` (`CheckUserStatus`) — force-logs-out and redirects users whose `status === 1` (inactive); applied on the main authenticated `web.php` group
 - `prevent-back-history` (`PreventBackHistory`) — applied alongside `check.status`
 - `EnsureSingleSession` (registered globally in the `web` group) — on every authenticated request, deletes any other active session rows for that user in the `sessions` table, enforcing single-session-per-user by force-logging out other sessions
 - `SafeText` — validates POST/PUT/PATCH string input against a restrictive allowed-character regex, returns 422 on violation (available but check where it's actually applied before assuming it runs everywhere)
+- `EnsurePermission` (`permission:*`) — checks a named permission against the current user's role, used e.g. on role-management mutation routes
+- `ThemeMiddleware` — available but check usage before assuming it's wired into a given route group
 
 **Deployment layout** (see README): production deployment splits the repo into `app_core/` (all Laravel framework files: app, bootstrap, config, database, resources, routes, storage, vendor) with only `public/` exposed as the web root. `public/index.php` needs its relative paths updated to point at `app_core/` when restructured this way. Always run `npm run build` before restructuring for deployment. Never commit `.env`.

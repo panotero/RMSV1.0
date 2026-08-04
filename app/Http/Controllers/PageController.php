@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\MailerSetting;
 use App\Models\User;
 use App\Models\SettingRole;
+use App\Models\UserDepartment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -14,6 +15,15 @@ class PageController extends Controller
     public function page_dashboard()
     {
         return view('pages.dashboard');
+    }
+
+    public function page_NotificationTest()
+    {
+        return view('pages.settings.notification_test', [
+            'roles' => SettingRole::orderBy('role_name')->get(['id', 'role_name']),
+            'departments' => UserDepartment::orderBy('name')->get(['id', 'name']),
+            'users' => User::orderBy('name')->get(['id', 'name']),
+        ]);
     }
 
     public function page_UserManagement()
@@ -45,45 +55,9 @@ class PageController extends Controller
     {
         return view('pages.settings.team_management');
     }
-    public function page_Forms()
-    {
-        return view('pages.settings.forms');
-    }
-
-    public function page_featuredHome()
-    {
-        return view('pages.featuredHome');
-    }
-
     public function page_settings()
     {
         return view('pages.settings.settings');
-    }
-    public function page_documents()
-    {
-        return view('pages.documents');
-    }
-
-    public function page_approvals()
-    {
-
-        return view('pages.approvals');
-    }
-
-    public function page_reports_documents()
-    {
-
-        return view('pages.reports.documents');
-    }
-
-    public function page_reports_users()
-    {
-        return view('pages.reports.users');
-    }
-    public function page_finance_tracker()
-    {
-
-        return view('pages.finance');
     }
 
     public function profile()
@@ -94,56 +68,5 @@ class PageController extends Controller
     public function settings()
     {
         return "page settings";
-    }
-
-
-    public function page_bookings()
-    {
-        return view('pages.bookings');
-    }
-    public function page_shipperConsignee()
-    {
-        return view('pages.shipperConsignee');
-    }
-    public function page_contracts()
-    {
-        return view('pages.contracts');
-    }
-    public function page_reports()
-    {
-        return view('pages.reports');
-    }
-
-    public function page_lookupValues()
-    {
-        return view('pages.settings.lookupVal');
-    }
-
-    public function page_crm()
-    {
-
-        return view('pages.crm');
-    }
-
-    public function page_proposals()
-    {
-        return view('pages.proposals');
-    }
-    public function page_maintenance()
-    {
-        return view('pages.maintenance');
-    }
-    public function page_clientMasters()
-    {
-        return view('pages.clientMasters');
-    }
-
-    public function page_clientMasterForm()
-    {
-        return view('pages.clientMasterForm');
-    }
-    public function page_crmLeadForm()
-    {
-        return view('pages.crmLeadForm');
     }
 }

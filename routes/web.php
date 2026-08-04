@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use Symfony\Component\HttpFoundation\Request;
@@ -8,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PageController;
 use App\Http\Middleware\CheckUserStatus;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\ProposalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +52,7 @@ Route::middleware(['auth', 'check.status', 'prevent-back-history'])->group(funct
     Route::resource('users', UserController::class)->middleware('can:isSuperAdmin');
 
     Route::prefix('notifications')->group(function () {
-        Route::get('/', [NotificationController::class, 'getNotifications']);
+        Route::get('/', [NotificationController::class, 'index']);
     });
 });
 require __DIR__ . '/auth.php';

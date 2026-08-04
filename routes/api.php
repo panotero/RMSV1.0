@@ -26,12 +26,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/load_menu', [MenusController::class, 'index']);
     Route::get('/nav-icons', [NavIconController::class, 'index']);
     Route::prefix('notifications')->group(function () {
-        Route::get('/', [NotificationController::class, 'getNotifications']);
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::post('/mark-read', [NotificationController::class, 'markRead']);
     });
-
-
-    Route::post('/notifications/mark-read', [NotificationController::class, 'markRead']);
-    Route::get('/notifications/stream', [NotificationController::class, 'stream']);
+    Route::post('/notifications/test-send', [NotificationController::class, 'testSend'])->middleware('can:isSuperAdmin');
 
 
     Route::prefix('users')->group(function () {
@@ -88,6 +87,4 @@ Route::middleware(['auth'])->group(function () {
             'message' => 'API successfully triggered!',
         ]);
     });
-
-    require __DIR__ . '/api_maintenance.php';
 });
