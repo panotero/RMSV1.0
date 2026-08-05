@@ -1,0 +1,2 @@
+- [Recruitment module SPA pages](recruitment_applicant_pages.md) — applicant_new/applicants/applicant_view blades, endpoint shapes, IIFE pattern used
+- [SPA page conventions](spa_page_conventions.md) — how Blade pages work in this AJAX SPA (loadPage, apiCall gotcha, renderRemoteTable, no Alpine)

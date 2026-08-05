@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             departmentSeeder::class,
             userstatusSeeder::class,
+            RecruitmentFormSeeder::class,
 
         ]);
     }

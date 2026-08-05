@@ -56,6 +56,14 @@ class NavMenuSeeder extends Seeder
                 'parent_title' => null,
                 'menu_order' => '8',
             ],
+            [
+                'title' => 'Recruitment',
+                'icon' => 'user',
+                'link' => '#',
+                'allowed_roles' => ['1', '2', '3', '4'],
+                'parent_title' => null,
+                'menu_order' => '5',
+            ],
 
             // --- children: each parent above must be seeded first ---
             [
@@ -81,6 +89,30 @@ class NavMenuSeeder extends Seeder
                 'allowed_roles' => ['1'],
                 'parent_title' => 'Developer Option',
                 'menu_order' => '3',
+            ],
+            [
+                'title' => 'App Settings',
+                'icon' => 'cog-6-tooth',
+                'link' => '/page_app_settings',
+                'allowed_roles' => ['1'],
+                'parent_title' => 'Developer Option',
+                'menu_order' => '4',
+            ],
+            [
+                'title' => 'Applicants',
+                'icon' => 'list-bullet',
+                'link' => '/page_applicants',
+                'allowed_roles' => ['1', '2', '3', '4'],
+                'parent_title' => 'Recruitment',
+                'menu_order' => '1',
+            ],
+            [
+                'title' => 'Orientation Schedule',
+                'icon' => 'calendar',
+                'link' => '/page_orientation_schedule',
+                'allowed_roles' => ['1', '2', '3', '4'],
+                'parent_title' => 'Recruitment',
+                'menu_order' => '2',
             ],
         ];
 

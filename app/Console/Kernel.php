@@ -11,6 +11,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('run:something')->everyMinute();
         $schedule->command('check:dueDocument')->everyMinute();
+        $schedule->command('recruitment:notify-unprocessed')->dailyAt('17:00')->withoutOverlapping();
     }
     protected function commands(): void
     {

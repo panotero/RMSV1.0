@@ -11,6 +11,10 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\LookupListController;
+use App\Http\Controllers\ChecklistItemController;
+use App\Http\Controllers\RecruitmentFormController;
+use App\Http\Controllers\ApplicantController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +83,52 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/permissions', [RolesController::class, 'permissions']);
+
+    Route::prefix('lookupLists')->middleware('can:isSuperAdmin')->group(function () {
+        Route::get('/', [LookupListController::class, 'index']);
+        Route::post('/', [LookupListController::class, 'store']);
+        Route::post('/{listId}/items', [LookupListController::class, 'storeItem']);
+        Route::put('/items/{itemId}', [LookupListController::class, 'updateItem']);
+        Route::post('/{listId}/items/reorder', [LookupListController::class, 'reorderItems']);
+    });
+
+    Route::prefix('checklistItems')->middleware('can:isSuperAdmin')->group(function () {
+        Route::get('/', [ChecklistItemController::class, 'index']);
+        Route::post('/', [ChecklistItemController::class, 'store']);
+        Route::put('/{id}', [ChecklistItemController::class, 'update']);
+        Route::delete('/{id}', [ChecklistItemController::class, 'destroy']);
+    });
+
+    Route::prefix('checklistGroups')->middleware('can:isSuperAdmin')->group(function () {
+        Route::get('/', [ChecklistItemController::class, 'indexGroups']);
+        Route::post('/', [ChecklistItemController::class, 'storeGroup']);
+        Route::put('/{id}', [ChecklistItemController::class, 'updateGroup']);
+        Route::delete('/{id}', [ChecklistItemController::class, 'destroyGroup']);
+    });
+
+    Route::prefix('recruitmentForm')->middleware('can:isSuperAdmin')->group(function () {
+        Route::get('/active', [RecruitmentFormController::class, 'active']);
+        Route::post('/active/fields', [RecruitmentFormController::class, 'storeField']);
+        Route::put('/fields/{id}', [RecruitmentFormController::class, 'updateField']);
+        Route::delete('/fields/{id}', [RecruitmentFormController::class, 'destroyField']);
+    });
+
+    Route::prefix('applicants')->group(function () {
+        Route::get('/', [ApplicantController::class, 'index']);
+        Route::get('/formConfig', [ApplicantController::class, 'formConfig']);
+        Route::get('/statuses', [ApplicantController::class, 'statuses']);
+        Route::get('/{id}', [ApplicantController::class, 'show']);
+        Route::post('/', [ApplicantController::class, 'store']);
+        Route::patch('/{id}/status', [ApplicantController::class, 'updateStatus']);
+        Route::patch('/{id}/checklist/{itemId}', [ApplicantController::class, 'toggleChecklistItem']);
+        Route::patch('/{id}/interview', [ApplicantController::class, 'interview']);
+        Route::patch('/{id}/interviewSummary', [ApplicantController::class, 'interviewSummary']);
+        Route::get('/{id}/notes', [ApplicantController::class, 'notes']);
+        Route::post('/{id}/notes', [ApplicantController::class, 'storeNote']);
+        Route::put('/{id}/orientation', [ApplicantController::class, 'saveOrientation']);
+    });
+
+    Route::get('/applicantOrientations', [ApplicantController::class, 'orientationsIndex']);
 
     Route::post('/test-api', function (Request $request) {
         Log::info('Test API triggered', $request->all());

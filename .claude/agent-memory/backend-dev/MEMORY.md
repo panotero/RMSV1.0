@@ -1,0 +1,1 @@
+- [Recruitment module](project_recruitment_module.md) — DB/API/conditional-fields backend done (2026-08-04); checklist placeholders removed, Add Applicant nav removed; no frontend yet

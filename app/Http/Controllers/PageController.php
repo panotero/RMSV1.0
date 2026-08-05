@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\MailerSetting;
 use App\Models\User;
 use App\Models\SettingRole;
@@ -58,6 +57,21 @@ class PageController extends Controller
     public function page_settings()
     {
         return view('pages.settings.settings');
+    }
+
+    public function page_AppSettings()
+    {
+        return view('pages.recruitment.app_settings');
+    }
+
+    public function page_Applicants()
+    {
+        return view('pages.recruitment.applicants');
+    }
+
+    public function page_OrientationSchedule()
+    {
+        return view('pages.recruitment.orientation_schedule');
     }
 
     public function profile()

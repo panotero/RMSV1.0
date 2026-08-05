@@ -15,3 +15,7 @@ Route::get('/settings', [PageController::class, 'settings'])->name('settings');
 
 Route::get('/page_mailer', [PageController::class, 'page_Mailer']);
 Route::get('/page_notification_test', [PageController::class, 'page_NotificationTest'])->middleware('can:isSuperAdmin');
+
+Route::get('/page_app_settings', [PageController::class, 'page_AppSettings'])->middleware('can:isSuperAdmin');
+Route::get('/page_applicants', [PageController::class, 'page_Applicants']);
+Route::get('/page_orientation_schedule', [PageController::class, 'page_OrientationSchedule']);
