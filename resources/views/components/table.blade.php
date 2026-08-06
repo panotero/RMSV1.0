@@ -16,12 +16,14 @@
         </button>
     </div>
     <div class="bg-white border border-zinc-200 rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-zinc-200 text-sm">
-            <thead class="bg-zinc-50">
-                <tr class="table-header"></tr>
-            </thead>
-            <tbody class="table-body divide-y divide-zinc-100 "></tbody>
-        </table>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-zinc-200 text-sm">
+                <thead class="bg-zinc-50">
+                    <tr class="table-header"></tr>
+                </thead>
+                <tbody class="table-body divide-y divide-zinc-100 "></tbody>
+            </table>
+        </div>
 
         <div class="table-pagination"></div>
     </div>

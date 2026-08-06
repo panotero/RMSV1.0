@@ -39,7 +39,7 @@ window.initModal = function initModal({ modalId }) {
   });
 };
 
-window.initSideModal = function initSideModal({ modalId }) {
+window.initSideModal = function initSideModal({ modalId, confirmClose = true }) {
   const modal = document.getElementById(modalId);
 
   if (!modal) {
@@ -67,10 +67,12 @@ window.initSideModal = function initSideModal({ modalId }) {
 
   closeButtons.forEach((btn) => {
     btn.onclick = async function () {
-      const confirmed = await customConfirm(
-        "You have unsaved changes. Are you sure you want to close?",
-      );
-      if (!confirmed) return;
+      if (confirmClose) {
+        const confirmed = await customConfirm(
+          "You have unsaved changes. Are you sure you want to close?",
+        );
+        if (!confirmed) return;
+      }
       closeSideModal(modalId, scrollY);
     };
   });
@@ -364,4 +366,96 @@ window.clearInputs = function clearInputs() {
   document.querySelectorAll("textarea").forEach((textarea) => {
     textarea.value = "";
   });
+};
+
+// Below this width (matches Tailwind's `lg` breakpoint) a flyout centers
+// itself on the screen instead of anchoring to its trigger button - there's
+// rarely enough room beside/above/below the button on phones and tablets.
+window.FLYOUT_COMPACT_BREAKPOINT = 1024;
+
+// Positions a flyout/dropdown panel against its anchor button.
+// On compact (mobile/tablet) viewports it's centered on the screen via
+// `position: fixed`. On larger viewports it's anchored to the button via
+// Tailwind's bottom-full/top-full + left-0/right-0 utility pairs, flipping
+// /clamping whichever axis would otherwise bleed outside the given scroll
+// container (defaults to the SPA's #content pane) so it always stays fully
+// visible within it.
+window.positionFlyout = function positionFlyout(panel, anchor, opts = {}) {
+  const compact = window.innerWidth < window.FLYOUT_COMPACT_BREAKPOINT;
+
+  if (compact) {
+    panel.classList.remove(
+      "absolute", "bottom-full", "top-full", "mb-2", "mt-2", "left-0", "right-0"
+    );
+    panel.classList.add("fixed", "top-1/2", "left-1/2", "-translate-x-1/2", "-translate-y-1/2");
+    return;
+  }
+
+  panel.classList.remove("fixed", "top-1/2", "left-1/2", "-translate-x-1/2", "-translate-y-1/2");
+  panel.classList.add("absolute");
+
+  const container =
+    (opts.container && document.querySelector(opts.container)) ||
+    document.getElementById("content") ||
+    document.body;
+  const hAlign = opts.hAlign === "left" ? "left" : "right";
+
+  // Reset to the natural "above the anchor" position on the preferred
+  // horizontal side, so measurements below reflect its real rendered size.
+  panel.classList.remove("top-full", "mt-2", "bottom-full", "mb-2", "left-0", "right-0");
+  panel.classList.add("bottom-full", "mb-2");
+  panel.classList.add(hAlign === "left" ? "left-0" : "right-0");
+
+  const containerRect = container.getBoundingClientRect();
+  let panelRect = panel.getBoundingClientRect();
+
+  // Vertical: flip to below the anchor if opening above bleeds past the
+  // container's visible top edge.
+  if (panelRect.top < containerRect.top) {
+    panel.classList.remove("bottom-full", "mb-2");
+    panel.classList.add("top-full", "mt-2");
+  }
+
+  panelRect = panel.getBoundingClientRect();
+
+  // Horizontal: flip side if it bleeds past the container's left/right edge.
+  if (panelRect.left < containerRect.left) {
+    panel.classList.remove("right-0");
+    panel.classList.add("left-0");
+  } else if (panelRect.right > containerRect.right) {
+    panel.classList.remove("left-0");
+    panel.classList.add("right-0");
+  }
+};
+
+// Reveals a flyout/dropdown panel (positioning it first via positionFlyout)
+// with a short fade + scale entrance, matching the app's existing
+// <x-dropdown> transition timings (200ms ease-out in, 75ms ease-in out).
+window.showFlyout = function showFlyout(panel, anchor, opts = {}) {
+  panel.classList.remove("hidden");
+  positionFlyout(panel, anchor, opts);
+
+  panel.classList.remove("ease-in", "duration-75", "opacity-100", "scale-100");
+  panel.classList.add("transition", "ease-out", "duration-200", "opacity-0", "scale-95");
+
+  // Force a reflow so the "opacity-0 scale-95" start state is registered
+  // before the end-state classes land - otherwise both apply in the same
+  // frame and there's nothing to transition between.
+  void panel.offsetWidth;
+
+  requestAnimationFrame(() => {
+    panel.classList.remove("opacity-0", "scale-95");
+    panel.classList.add("opacity-100", "scale-100");
+  });
+};
+
+window.hideFlyout = function hideFlyout(panel) {
+  if (panel.classList.contains("hidden")) return;
+
+  panel.classList.remove("ease-out", "duration-200", "opacity-100", "scale-100");
+  panel.classList.add("ease-in", "duration-75", "opacity-0", "scale-95");
+
+  setTimeout(() => {
+    panel.classList.add("hidden");
+  }, 75);
 };

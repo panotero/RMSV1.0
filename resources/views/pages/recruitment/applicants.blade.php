@@ -53,9 +53,9 @@
             </button>
 
             <div id="exportPanel"
-                class="hidden absolute z-20 bottom-full right-0 mb-2 w-[40vw] max-w-[95vw] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg p-4">
+                class="hidden absolute z-20 bottom-full right-0 mb-2 w-[90vw] lg:w-[40vw] max-w-[95vw] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg p-4">
 
-                <div class="flex gap-4">
+                <div class="flex flex-col-reverse lg:flex-row gap-4">
 
                     {{-- LEFT: inputs + actions --}}
                     <div class="flex-1 flex flex-col gap-3">
@@ -108,10 +108,16 @@
                             </div>
                         </div>
 
-                        <button type="button" id="exportRunBtn"
-                            class="w-full mt-auto px-4 py-1.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition">
-                            Export
-                        </button>
+                        <div class="flex gap-2 mt-auto">
+                            <button type="button" id="exportCancelBtn"
+                                class="flex-1 px-4 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition">
+                                Cancel
+                            </button>
+                            <button type="button" id="exportRunBtn"
+                                class="flex-1 px-4 py-1.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition">
+                                Export
+                            </button>
+                        </div>
                     </div>
 
                     {{-- RIGHT: calendar --}}
@@ -2451,13 +2457,23 @@
 
         exportBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            exportPanel.classList.toggle('hidden');
+            if (exportPanel.classList.contains('hidden')) {
+                showFlyout(exportPanel, exportBtn, {
+                    hAlign: 'right'
+                });
+            } else {
+                hideFlyout(exportPanel);
+            }
+        });
+
+        document.getElementById('exportCancelBtn').addEventListener('click', function() {
+            hideFlyout(exportPanel);
         });
 
         document.addEventListener('click', function(e) {
             if (!exportPanel.classList.contains('hidden') && !exportPanel.contains(e.target) && e.target !==
                 exportBtn) {
-                exportPanel.classList.add('hidden');
+                hideFlyout(exportPanel);
             }
         });
 
@@ -2506,7 +2522,7 @@
             if (status) url += '&status=' + encodeURIComponent(status);
 
             window.location.href = url;
-            exportPanel.classList.add('hidden');
+            hideFlyout(exportPanel);
         });
     })();
 </script>
