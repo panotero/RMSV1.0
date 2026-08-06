@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/permissions', [RolesController::class, 'permissions']);
 
-    Route::prefix('lookupLists')->middleware('can:isSuperAdmin')->group(function () {
+    Route::prefix('lookupLists')->middleware('can:manageAppSettings')->group(function () {
         Route::get('/', [LookupListController::class, 'index']);
         Route::post('/', [LookupListController::class, 'store']);
         Route::post('/{listId}/items', [LookupListController::class, 'storeItem']);
@@ -92,21 +92,21 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{listId}/items/reorder', [LookupListController::class, 'reorderItems']);
     });
 
-    Route::prefix('checklistItems')->middleware('can:isSuperAdmin')->group(function () {
+    Route::prefix('checklistItems')->middleware('can:manageAppSettings')->group(function () {
         Route::get('/', [ChecklistItemController::class, 'index']);
         Route::post('/', [ChecklistItemController::class, 'store']);
         Route::put('/{id}', [ChecklistItemController::class, 'update']);
         Route::delete('/{id}', [ChecklistItemController::class, 'destroy']);
     });
 
-    Route::prefix('checklistGroups')->middleware('can:isSuperAdmin')->group(function () {
+    Route::prefix('checklistGroups')->middleware('can:manageAppSettings')->group(function () {
         Route::get('/', [ChecklistItemController::class, 'indexGroups']);
         Route::post('/', [ChecklistItemController::class, 'storeGroup']);
         Route::put('/{id}', [ChecklistItemController::class, 'updateGroup']);
         Route::delete('/{id}', [ChecklistItemController::class, 'destroyGroup']);
     });
 
-    Route::prefix('recruitmentForm')->middleware('can:isSuperAdmin')->group(function () {
+    Route::prefix('recruitmentForm')->middleware('can:manageAppSettings')->group(function () {
         Route::get('/active', [RecruitmentFormController::class, 'active']);
         Route::post('/active/fields', [RecruitmentFormController::class, 'storeField']);
         Route::put('/fields/{id}', [RecruitmentFormController::class, 'updateField']);
@@ -117,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [ApplicantController::class, 'index']);
         Route::get('/formConfig', [ApplicantController::class, 'formConfig']);
         Route::get('/statuses', [ApplicantController::class, 'statuses']);
+        Route::get('/export', [ApplicantController::class, 'export']);
         Route::get('/{id}', [ApplicantController::class, 'show']);
         Route::post('/', [ApplicantController::class, 'store']);
         Route::patch('/{id}/status', [ApplicantController::class, 'updateStatus']);
@@ -126,9 +127,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/notes', [ApplicantController::class, 'notes']);
         Route::post('/{id}/notes', [ApplicantController::class, 'storeNote']);
         Route::put('/{id}/orientation', [ApplicantController::class, 'saveOrientation']);
+        Route::get('/{id}/activity', [ApplicantController::class, 'activity']);
+        Route::patch('/{id}/info', [ApplicantController::class, 'updateInfo']);
+        Route::patch('/{id}/answers', [ApplicantController::class, 'updateAnswers']);
     });
 
+    Route::get('/applicantOrientations/export', [ApplicantController::class, 'orientationExport']);
     Route::get('/applicantOrientations', [ApplicantController::class, 'orientationsIndex']);
+    Route::get('/applicantOrientations/{orientationId}', [ApplicantController::class, 'orientationDetail']);
+
+    Route::get('/dashboard/summary', [ApplicantController::class, 'dashboardSummary']);
 
     Route::post('/test-api', function (Request $request) {
         Log::info('Test API triggered', $request->all());

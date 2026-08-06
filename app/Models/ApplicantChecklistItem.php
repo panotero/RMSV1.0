@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Casts\FriendlyDateTime;
+use App\Concerns\HasFriendlyDates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ApplicantChecklistItem extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFriendlyDates;
 
     protected $fillable = [
         'applicant_id',
@@ -18,10 +20,10 @@ class ApplicantChecklistItem extends Model
     ];
 
     protected $casts = [
-        'created_at' => 'datetime:M d, Y, h:i A',
-        'updated_at' => 'datetime:M d, Y, h:i A',
+        'created_at' => FriendlyDateTime::class,
+        'updated_at' => FriendlyDateTime::class,
         'is_done' => 'boolean',
-        'done_at' => 'datetime',
+        'done_at' => FriendlyDateTime::class,
         'applicant_id' => 'integer',
         'checklist_item_id' => 'integer',
         'done_by' => 'integer',

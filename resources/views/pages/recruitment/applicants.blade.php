@@ -6,10 +6,12 @@
             <h1 class="text-2xl font-bold">Applicants</h1>
             <p class="text-zinc-500">Track and manage candidates through the recruitment pipeline</p>
         </div>
-        <button id="btnAddApplicant"
-            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-            + Add Applicant
-        </button>
+        <div class="flex items-center gap-2">
+            <button id="btnAddApplicant"
+                class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                + Add Applicant
+            </button>
+        </div>
     </div>
 
     {{-- FILTERS --}}
@@ -32,15 +34,94 @@
     {{-- TABLE --}}
     <x-table id="applicantsTable" />
 
-    @if(auth()->user()->is_team_leader)
-        <div class="mt-3 p-2">
-            <label class="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300 cursor-pointer">
-                <input type="checkbox" id="scopeAllToggle" checked
-                    class="rounded border-zinc-300 text-orange-500 focus:ring-orange-400">
-                Show all team members' applicants
-            </label>
+    <div class="mt-3 p-2 flex items-center justify-between">
+        <div>
+            @if (auth()->user()->is_team_leader)
+                <label class="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300 cursor-pointer">
+                    <input type="checkbox" id="scopeAllToggle" checked
+                        class="rounded border-zinc-300 text-orange-500 focus:ring-orange-400">
+                    Show all team members' applicants
+                </label>
+            @endif
         </div>
-    @endif
+
+        {{-- EXPORT --}}
+        <div class="relative">
+            <button type="button" id="btnExportApplicants"
+                class="px-4 py-2 rounded-lg text-sm font-medium border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">
+                Export
+            </button>
+
+            <div id="exportPanel"
+                class="hidden absolute z-20 bottom-full right-0 mb-2 w-[40vw] max-w-[95vw] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg p-4">
+
+                <div class="flex gap-4">
+
+                    {{-- LEFT: inputs + actions --}}
+                    <div class="flex-1 flex flex-col gap-3">
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" id="exportPresetToday"
+                                class="px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition">
+                                Today
+                            </button>
+                            <button type="button" id="exportPresetThisWeek"
+                                class="px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition">
+                                This Week
+                            </button>
+                            <button type="button" id="exportPresetLastWeek"
+                                class="px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition">
+                                Last Week
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex flex-col gap-1">
+                                <label
+                                    class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">From</label>
+                                <input type="date" id="exportFrom"
+                                    class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1.5 text-xs text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label
+                                    class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">To</label>
+                                <input type="date" id="exportTo"
+                                    class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1.5 text-xs text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">File
+                                Type</label>
+                            <select id="exportFormat"
+                                class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                                <option value="csv" selected>CSV</option>
+                                <option value="xlsx">Excel</option>
+                                <option value="pdf">PDF</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label
+                                class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Status</label>
+                            <div id="exportStatusFilter"
+                                class="flex flex-col gap-1.5 max-h-28 overflow-y-auto border border-zinc-200 dark:border-zinc-700 rounded-lg p-2 bg-zinc-50 dark:bg-zinc-800">
+                            </div>
+                        </div>
+
+                        <button type="button" id="exportRunBtn"
+                            class="w-full mt-auto px-4 py-1.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition">
+                            Export
+                        </button>
+                    </div>
+
+                    {{-- RIGHT: calendar --}}
+                    <div class="flex-1">
+                        <div id="exportCalendar" class="p-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {{-- ADD APPLICANT SIDE MODAL --}}
     <x-side-modal id="addApplicantSideModal">
@@ -125,16 +206,6 @@
                         specify</label>
                     <input type="text" id="sourceOtherSpecifyInput"
                         class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
-                </div>
-
-                {{-- Preferred Location --}}
-                <div class="flex flex-col gap-1">
-                    <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Preferred
-                        Location</label>
-                    <select id="locationSelect" name="location_id"
-                        class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
-                        <option value="">Select location</option>
-                    </select>
                 </div>
 
                 {{-- Phone --}}
@@ -247,9 +318,13 @@
                         <div class="flex items-center gap-3 mb-4">
                             <h2 id="applicantName" class="text-xl font-bold text-zinc-800 dark:text-zinc-100"></h2>
                             <span id="applicantStatusBadge"></span>
+                            <button type="button" id="btnEditInfo"
+                                class="ml-auto text-xs font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition">
+                                Edit
+                            </button>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
                             <div>
                                 <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Assigned To
                                 </p>
@@ -260,6 +335,29 @@
                                 <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Location
                                 </p>
                                 <p id="applicantLocation" class="text-sm text-zinc-800 dark:text-zinc-100 mt-0.5"></p>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Role</p>
+                                <p id="applicantRole" class="text-sm text-zinc-800 dark:text-zinc-100 mt-0.5"></p>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Source</p>
+                                <p id="applicantSource" class="text-sm text-zinc-800 dark:text-zinc-100 mt-0.5"></p>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Phone</p>
+                                <p id="applicantPhoneView" class="text-sm text-zinc-800 dark:text-zinc-100 mt-0.5">
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Email</p>
+                                <p id="applicantEmailView" class="text-sm text-zinc-800 dark:text-zinc-100 mt-0.5">
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Date of
+                                    Birth</p>
+                                <p id="applicantDobView" class="text-sm text-zinc-800 dark:text-zinc-100 mt-0.5"></p>
                             </div>
                             <div>
                                 <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Created</p>
@@ -315,10 +413,16 @@
                         <div class="flex justify-between items-center mb-2">
                             <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Application
                                 Answers</p>
-                            <button type="button" id="btnCopyAnswers"
-                                class="text-xs font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition">
-                                Copy
-                            </button>
+                            <div class="flex items-center gap-3">
+                                <button type="button" id="btnEditAnswers"
+                                    class="hidden text-xs font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition">
+                                    Edit
+                                </button>
+                                <button type="button" id="btnCopyAnswers"
+                                    class="text-xs font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition">
+                                    Copy
+                                </button>
+                            </div>
                         </div>
                         <div id="applicantAnswersList"></div>
                     </div>
@@ -351,6 +455,13 @@
                         <div id="notesList"></div>
                     </div>
 
+                    {{-- Activity History card --}}
+                    <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5">
+                        <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-400 mb-2">Activity
+                            History</p>
+                        <div id="activityList" class="max-h-64 overflow-y-auto"></div>
+                    </div>
+
                 </div>
 
                 {{-- RIGHT COLUMN --}}
@@ -372,6 +483,127 @@
 
             </div>
 
+        </div>
+
+    </x-side-modal>
+
+    {{-- EDIT APPLICANT SIDE MODAL --}}
+    <x-side-modal id="editApplicantSideModal">
+
+        {{-- Header --}}
+        <div
+            class="p-5 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center sticky top-0 bg-white dark:bg-zinc-900 z-10">
+            <div>
+                <p class="text-[11px] font-medium text-zinc-400 uppercase tracking-widest">Recruitment</p>
+                <p class="text-lg font-semibold dark:text-white mt-0.5">Edit Applicant</p>
+            </div>
+            <button
+                class="modal-close text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                ✕
+            </button>
+        </div>
+
+        {{-- Body --}}
+        <div class="p-5">
+            <form id="editApplicantForm" class="space-y-4">
+
+                {{-- Full Name --}}
+                <div class="flex flex-col gap-1">
+                    <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Full Name
+                        <span class="text-red-500">*</span></label>
+                    <input type="text" id="editFullName" required
+                        class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                </div>
+
+                {{-- Role --}}
+                <div class="flex flex-col gap-1">
+                    <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Role</label>
+                    <select id="editRoleSelect"
+                        class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                        <option value="">Select role</option>
+                    </select>
+                </div>
+
+                {{-- Source --}}
+                <div class="flex flex-col gap-1">
+                    <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Source</label>
+                    <select id="editSourceSelect"
+                        class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                        <option value="">Select source</option>
+                    </select>
+                </div>
+
+                {{-- Employee referral name (shown only when Source = Employee Referral) --}}
+                <div class="flex flex-col gap-1 hidden" id="editSourceReferralNameWrap">
+                    <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Employee name who
+                        referred the applicant</label>
+                    <input type="text" id="editSourceReferralNameInput"
+                        class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                </div>
+
+                {{-- Other source, specify (shown only when Source = Other) --}}
+                <div class="flex flex-col gap-1 hidden" id="editSourceOtherSpecifyWrap">
+                    <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Please
+                        specify</label>
+                    <input type="text" id="editSourceOtherSpecifyInput"
+                        class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                </div>
+
+                {{-- Territory / Location --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1">
+                        <label
+                            class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Territory</label>
+                        <select id="editTerritorySelect"
+                            class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            <option value="">Select territory</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Location</label>
+                        <select id="editLocationSelect"
+                            class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            <option value="">Select a territory first</option>
+                        </select>
+                    </div>
+                </div>
+
+                {{-- Phone --}}
+                <div class="flex flex-col gap-1">
+                    <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Phone</label>
+                    <input type="text" id="editPhone"
+                        class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                </div>
+
+                {{-- Email --}}
+                <div class="flex flex-col gap-1">
+                    <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Email</label>
+                    <input type="email" id="editEmail"
+                        class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                </div>
+
+                {{-- Date of Birth --}}
+                <div class="flex flex-col gap-1">
+                    <label class="text-[11px] font-medium uppercase tracking-widest text-zinc-400">Date of
+                        Birth</label>
+                    <input type="date" id="editDob"
+                        class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition">
+                </div>
+
+            </form>
+        </div>
+
+        {{-- Footer --}}
+        <div
+            class="border-t border-zinc-100 dark:border-zinc-800 px-5 py-4 flex justify-end gap-2 sticky bottom-0 bg-white dark:bg-zinc-900">
+            <button type="button"
+                class="modal-close px-4 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition">
+                Cancel
+            </button>
+            <button type="button" id="saveEditInfoBtn"
+                class="px-4 py-1.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition">
+                Save
+            </button>
         </div>
 
     </x-side-modal>
@@ -479,6 +711,7 @@
         </div>
     </x-modal>
 
+
 </div>
 
 {{-- JS --}}
@@ -505,6 +738,11 @@
         // modal (which is the only place these fields render now).
         let cachedFormFields = null;
 
+        // Cached territories (with nested .locations) from
+        // /api/applicants/formConfig, shared between the Interview form's
+        // and Edit Applicant form's territory/location selects.
+        let cachedTerritories = [];
+
         async function loadStatuses() {
             const res = await apiCall({
                 mode: 'GET',
@@ -520,23 +758,33 @@
             filter.innerHTML = '<option value="">All</option>' +
                 STATUSES.map(s => `<option value="${s}">${s}</option>`).join("");
             filter.value = current;
+
+            const exportFilter = document.getElementById('exportStatusFilter');
+            if (exportFilter) {
+                exportFilter.innerHTML = STATUSES.map(s => `
+                    <label class="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300 cursor-pointer">
+                        <input type="checkbox" value="${s}" class="export-status-checkbox rounded border-zinc-300 text-orange-500 focus:ring-orange-400">
+                        ${s}
+                    </label>
+                `).join("");
+            }
         }
 
         function statusBadge(status) {
-            const classes = STATUS_BADGES[status] ?? 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300';
+            const classes = STATUS_BADGES[status] ??
+                'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300';
             return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${classes}">${status ?? '—'}</span>`;
         }
 
+        // The API already sends dates pre-formatted ("January 1, 2001" or
+        // "January 1, 2001, 1:00 AM" - see App\Support\FriendlyDate) -
+        // these just supply the "—" fallback, no re-parsing.
         function formatDate(value) {
-            if (!value) return '—';
-            const date = new Date(value);
-            return isNaN(date.getTime()) ? value : date.toLocaleString();
+            return value || '—';
         }
 
         function formatDateOnly(value) {
-            if (!value) return '—';
-            const date = new Date(String(value).slice(0, 10) + 'T00:00:00');
-            return isNaN(date.getTime()) ? value : date.toLocaleDateString();
+            return value || '—';
         }
 
         function apiErrorMessage(res) {
@@ -612,7 +860,6 @@
         const addLoadingEl = addModalEl.querySelector('#applicantFormLoading');
         const addErrorEl = addModalEl.querySelector('#applicantFormError');
         const applicantFormEl = addModalEl.querySelector('#applicantForm');
-        const locationSelect = addModalEl.querySelector('#locationSelect');
         const roleSelect = addModalEl.querySelector('#roleSelect');
         const sourceSelect = addModalEl.querySelector('#sourceSelect');
         const sourceReferralNameWrap = addModalEl.querySelector('#sourceReferralNameWrap');
@@ -628,28 +875,43 @@
         const dateDisplay = addModalEl.querySelector('#applicantDateDisplay');
         const candidateNameInput = addModalEl.querySelector('#candidateName');
 
-        function renderLocations(territories) {
-            const hasAnyLocation = (territories || []).some(t => (t.locations || []).length > 0);
+        // Fills a territory <select> with a placeholder option + one option
+        // per territory. Shared between the Interview form's and Edit
+        // Applicant form's territory/location rows.
+        function populateTerritorySelect(territorySelectEl, territories) {
+            territorySelectEl.innerHTML = '<option value="">Select territory</option>' +
+                (territories || []).map(t => `<option value="${t.id}">${t.name}</option>`).join("");
+        }
 
-            if (!hasAnyLocation) {
-                locationSelect.innerHTML = '<option value="">No locations configured yet.</option>';
-                locationSelect.disabled = true;
+        // Given the chosen territory object (with .locations), fills the
+        // location <select>. Pass null/undefined when no territory is
+        // selected yet.
+        function populateLocationSelect(locationSelectEl, territory) {
+            if (!territory) {
+                locationSelectEl.innerHTML = '<option value="">Select a territory first</option>';
+                locationSelectEl.disabled = true;
                 return;
             }
 
-            locationSelect.disabled = false;
-            locationSelect.innerHTML = '<option value="">Select location</option>' +
-                territories
-                    .filter(t => (t.locations || []).length > 0)
-                    .map(t => `<optgroup label="${t.name}">` +
-                        t.locations.map(loc => `<option value="${loc.id}">${loc.name}</option>`).join("") +
-                        `</optgroup>`
-                    ).join("");
+            const locations = territory.locations || [];
+
+            if (!locations.length) {
+                locationSelectEl.innerHTML = '<option value="">No locations for this territory</option>';
+                locationSelectEl.disabled = true;
+                return;
+            }
+
+            locationSelectEl.disabled = false;
+            locationSelectEl.innerHTML = '<option value="">Select location</option>' +
+                locations.map(loc => `<option value="${loc.id}">${loc.name}</option>`).join("");
         }
 
+        let cachedRoles = [];
+
         function renderRoleOptions(roles) {
+            cachedRoles = roles || [];
             roleSelect.innerHTML = '<option value="">Select role</option>' +
-                (roles || []).map(r => `<option value="${r.id}">${r.name}</option>`).join("");
+                cachedRoles.map(r => `<option value="${r.id}">${r.name}</option>`).join("");
         }
 
         function renderSourceOptions(sources) {
@@ -681,7 +943,6 @@
             sourceReferralNameInput.value = '';
             sourceOtherSpecifyInput.value = '';
             toggleSourceDetailFields();
-            locationSelect.value = '';
             phoneInput.value = '';
             emailInput.value = '';
             dobInput.value = '';
@@ -702,7 +963,7 @@
                 return;
             }
 
-            renderLocations(res.data.territories);
+            cachedTerritories = res.data.territories ?? [];
             renderRoleOptions(res.data.roles);
             renderSourceOptions(res.data.sources);
             cachedFormFields = res.data.fields ?? [];
@@ -746,10 +1007,9 @@
                 role_id: roleSelect.value ? Number(roleSelect.value) : null,
                 source_id: sourceSelect.value ? Number(sourceSelect.value) : null,
                 source_detail: sourceReferralNameWrap.classList.contains('hidden') ?
-                    (sourceOtherSpecifyWrap.classList.contains('hidden') ? null : (sourceOtherSpecifyInput.value
-                        .trim() || null)) :
-                    (sourceReferralNameInput.value.trim() || null),
-                location_id: locationSelect.value ? Number(locationSelect.value) : null,
+                    (sourceOtherSpecifyWrap.classList.contains('hidden') ? null : (
+                        sourceOtherSpecifyInput.value
+                        .trim() || null)) : (sourceReferralNameInput.value.trim() || null),
                 phone: phoneInput.value.trim() || null,
                 email: emailInput.value.trim() || null,
                 date_of_birth: dobInput.value || null,
@@ -797,6 +1057,11 @@
         const viewStatusSelectEl = viewModalEl.querySelector('#applicantStatusSelect');
         const viewAssignedToEl = viewModalEl.querySelector('#applicantAssignedTo');
         const viewLocationEl = viewModalEl.querySelector('#applicantLocation');
+        const viewRoleEl = viewModalEl.querySelector('#applicantRole');
+        const viewSourceEl = viewModalEl.querySelector('#applicantSource');
+        const viewPhoneEl = viewModalEl.querySelector('#applicantPhoneView');
+        const viewEmailEl = viewModalEl.querySelector('#applicantEmailView');
+        const viewDobEl = viewModalEl.querySelector('#applicantDobView');
         const viewCreatedAtEl = viewModalEl.querySelector('#applicantCreatedAt');
         const viewLastActivityEl = viewModalEl.querySelector('#applicantLastActivity');
         const viewAnswersListEl = viewModalEl.querySelector('#applicantAnswersList');
@@ -807,15 +1072,34 @@
         const saveInterviewSummaryBtn = viewModalEl.querySelector('#saveInterviewSummaryBtn');
         const btnInterview = viewModalEl.querySelector('#btnInterview');
         const btnCopyAnswers = viewModalEl.querySelector('#btnCopyAnswers');
+        const btnEditAnswers = viewModalEl.querySelector('#btnEditAnswers');
+        const btnEditInfo = viewModalEl.querySelector('#btnEditInfo');
 
         let currentApplicantId = null;
         let currentApplicant = null;
+
+        function updateInterviewButtonVisibility() {
+            if (currentApplicant && currentApplicant.status === 'New') {
+                btnInterview.classList.remove('hidden');
+            } else {
+                btnInterview.classList.add('hidden');
+            }
+        }
 
         function renderViewHeader(applicant) {
             viewNameEl.textContent = applicant.full_name;
             viewStatusBadgeEl.innerHTML = statusBadge(applicant.status);
             viewAssignedToEl.textContent = applicant.assignee_name ?? '—';
-            viewLocationEl.textContent = applicant.location_name ?? '—';
+            viewLocationEl.textContent = applicant.territory_name && applicant.location_name ?
+                `${applicant.territory_name} — ${applicant.location_name}` :
+                (applicant.location_name || applicant.territory_name || '—');
+            viewRoleEl.textContent = applicant.role_name ?? '—';
+            viewSourceEl.textContent = applicant.source_name ?
+                (applicant.source_detail ? `${applicant.source_name} — ${applicant.source_detail}` : applicant
+                    .source_name) : '—';
+            viewPhoneEl.textContent = applicant.phone ?? '—';
+            viewEmailEl.textContent = applicant.email ?? '—';
+            viewDobEl.textContent = formatDateOnly(applicant.date_of_birth);
             viewCreatedAtEl.textContent = formatDate(applicant.created_at);
             viewLastActivityEl.textContent = formatDate(applicant.last_activity_at);
 
@@ -825,7 +1109,10 @@
 
             viewInterviewSummaryEl.value = applicant.interview_summary ?? '';
 
+            btnEditAnswers.classList.toggle('hidden', !applicant.has_answers);
+
             updateScheduleOrientationButton();
+            updateInterviewButtonVisibility();
         }
 
         function renderAnswers(answers) {
@@ -950,6 +1237,7 @@
 
             renderViewAll(res.data);
             await loadNotes(id);
+            await loadActivity(id);
 
             viewLoadingEl.classList.add('hidden');
             viewContentEl.classList.remove('hidden');
@@ -1137,7 +1425,8 @@
 
             const answersText = answers.map(a => {
                 const value = Array.isArray(a.value) ? a.value.join(', ') : a.value;
-                const displayValue = (value === null || value === undefined || value === '') ? '—' : value;
+                const displayValue = (value === null || value === undefined || value === '') ?
+                    '—' : value;
                 return `${a.label}: ${displayValue}`;
             }).join('\n');
 
@@ -1163,6 +1452,168 @@
             openInterviewModal();
         });
 
+        // ===================== EDIT APPLICANT INFO MODAL =====================
+
+        const editModalEl = document.getElementById('editApplicantSideModal');
+        const editFullNameInput = editModalEl.querySelector('#editFullName');
+        const editRoleSelect = editModalEl.querySelector('#editRoleSelect');
+        const editSourceSelect = editModalEl.querySelector('#editSourceSelect');
+        const editSourceReferralNameWrap = editModalEl.querySelector('#editSourceReferralNameWrap');
+        const editSourceReferralNameInput = editModalEl.querySelector('#editSourceReferralNameInput');
+        const editSourceOtherSpecifyWrap = editModalEl.querySelector('#editSourceOtherSpecifyWrap');
+        const editSourceOtherSpecifyInput = editModalEl.querySelector('#editSourceOtherSpecifyInput');
+        const editTerritorySelect = editModalEl.querySelector('#editTerritorySelect');
+        const editLocationSelect = editModalEl.querySelector('#editLocationSelect');
+        const editPhoneInput = editModalEl.querySelector('#editPhone');
+        const editEmailInput = editModalEl.querySelector('#editEmail');
+        const editDobInput = editModalEl.querySelector('#editDob');
+        const saveEditInfoBtn = editModalEl.querySelector('#saveEditInfoBtn');
+
+        function toggleEditSourceDetailFields() {
+            const selected = cachedSources.find(s => String(s.id) === String(editSourceSelect.value));
+            const name = selected?.name ?? '';
+
+            const isReferral = name === 'Employee Referral';
+            const isOther = name === 'Other';
+
+            editSourceReferralNameWrap.classList.toggle('hidden', !isReferral);
+            editSourceOtherSpecifyWrap.classList.toggle('hidden', !isOther);
+
+            if (!isReferral) editSourceReferralNameInput.value = '';
+            if (!isOther) editSourceOtherSpecifyInput.value = '';
+        }
+
+        editSourceSelect.addEventListener('change', toggleEditSourceDetailFields);
+
+        editTerritorySelect.addEventListener('change', function() {
+            const territory = cachedTerritories.find(t => String(t.id) === String(editTerritorySelect
+                .value));
+            populateLocationSelect(editLocationSelect, territory);
+        });
+
+        editModalEl.addEventListener('click', function(e) {
+            const target = e.target;
+            if (target && target.matches && target.matches('input[type="date"]') && typeof target
+                .showPicker === 'function') {
+                try {
+                    target.showPicker();
+                } catch (_) {}
+            }
+        });
+
+        btnEditInfo.addEventListener('click', function() {
+            if (!currentApplicant) return;
+
+            editFullNameInput.value = currentApplicant.full_name ?? '';
+
+            populateTerritorySelect(editTerritorySelect, cachedTerritories);
+            editRoleSelect.innerHTML = '<option value="">Select role</option>' +
+                cachedRoles.map(r => `<option value="${r.id}">${r.name}</option>`).join("");
+            editSourceSelect.innerHTML = '<option value="">Select source</option>' +
+                cachedSources.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+
+            editRoleSelect.value = currentApplicant.role_id != null ? String(currentApplicant.role_id) : '';
+            editSourceSelect.value = currentApplicant.source_id != null ? String(currentApplicant
+                .source_id) : '';
+            toggleEditSourceDetailFields();
+
+            // Source detail: prefill whichever conditional input applies
+            // (Employee Referral name / Other specify).
+            if (!editSourceReferralNameWrap.classList.contains('hidden')) {
+                editSourceReferralNameInput.value = currentApplicant.source_detail ?? '';
+            } else if (!editSourceOtherSpecifyWrap.classList.contains('hidden')) {
+                editSourceOtherSpecifyInput.value = currentApplicant.source_detail ?? '';
+            }
+
+            if (currentApplicant.territory_id) {
+                editTerritorySelect.value = String(currentApplicant.territory_id);
+                const territory = cachedTerritories.find(t => String(t.id) === String(currentApplicant
+                    .territory_id));
+                populateLocationSelect(editLocationSelect, territory);
+                editLocationSelect.value = currentApplicant.location_id != null ? String(currentApplicant
+                    .location_id) : '';
+            } else {
+                editTerritorySelect.value = '';
+                populateLocationSelect(editLocationSelect, null);
+            }
+
+            editPhoneInput.value = currentApplicant.phone ?? '';
+            editEmailInput.value = currentApplicant.email ?? '';
+
+            // date_of_birth arrives pre-formatted ("January 1, 2001") from
+            // show() - best-effort parse back to YYYY-MM-DD for the
+            // <input type=date>; leave blank if it can't be parsed. Built
+            // from local date parts (not toISOString) to avoid a timezone
+            // day-shift.
+            editDobInput.value = '';
+            if (currentApplicant.date_of_birth) {
+                const parsed = new Date(currentApplicant.date_of_birth);
+                if (!isNaN(parsed.getTime())) {
+                    editDobInput.value = parsed.getFullYear() + '-' +
+                        String(parsed.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(parsed.getDate()).padStart(2, '0');
+                }
+            }
+
+            initSideModal({
+                modalId: 'editApplicantSideModal'
+            });
+        });
+
+        saveEditInfoBtn.addEventListener('click', async function() {
+            const fullName = editFullNameInput.value.trim();
+
+            if (!fullName) {
+                showMessage({
+                    status: 'error',
+                    title: 'Missing required fields',
+                    message: 'Full Name required.'
+                });
+                return;
+            }
+
+            const payload = {
+                full_name: fullName,
+                role_id: editRoleSelect.value ? Number(editRoleSelect.value) : null,
+                source_id: editSourceSelect.value ? Number(editSourceSelect.value) : null,
+                source_detail: editSourceReferralNameWrap.classList.contains('hidden') ?
+                    (editSourceOtherSpecifyWrap.classList.contains('hidden') ? null : (
+                        editSourceOtherSpecifyInput.value.trim() || null)) : (
+                        editSourceReferralNameInput.value.trim() || null),
+                territory_id: editTerritorySelect.value ? Number(editTerritorySelect.value) : null,
+                location_id: editLocationSelect.value ? Number(editLocationSelect.value) : null,
+                phone: editPhoneInput.value.trim() || null,
+                email: editEmailInput.value.trim() || null,
+                date_of_birth: editDobInput.value || null,
+            };
+
+            const res = await apiCall({
+                mode: 'PATCH',
+                isJson: true,
+                payload,
+                url: `/api/applicants/${currentApplicantId}/info`,
+                button: saveEditInfoBtn
+            });
+
+            if (!res || res.success !== true) {
+                showMessage({
+                    status: 'error',
+                    title: 'Error',
+                    message: apiErrorMessage(res)
+                });
+                return;
+            }
+
+            showMessage({
+                status: 'success',
+                title: 'Applicant updated'
+            });
+
+            closeSideModal('editApplicantSideModal');
+            await loadApplicant(currentApplicantId);
+            table.reload();
+        });
+
         // ===================== INTERVIEW MODAL =====================
 
         const INPUT_CLASSES =
@@ -1181,6 +1632,11 @@
         const interviewFailBtn = outcomeModalEl.querySelector('#interviewFailBtn');
 
         let currentFields = [];
+
+        // 'interview' (Interview button flow: territory/location row +
+        // pass/fail/incomplete) or 'edit' (Edit Answers flow: dynamic
+        // fields only, PATCHes /answers, no outcome).
+        let interviewMode = 'interview';
 
         function requiredMark(field) {
             return field.is_required ? ' <span class="text-red-500">*</span>' : '';
@@ -1279,11 +1735,57 @@
             return ordered;
         }
 
-        function renderInterviewFields(fields) {
+        function territoryLocationRowHtml() {
+            return `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1">
+                        <label class="${LABEL_CLASSES}">Territory</label>
+                        <select id="interviewTerritorySelect" class="${INPUT_CLASSES}">
+                            <option value="">Select territory</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="${LABEL_CLASSES}">Location</label>
+                        <select id="interviewLocationSelect" class="${INPUT_CLASSES}">
+                            <option value="">Select a territory first</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setupTerritoryLocationRow() {
+            const territorySelect = interviewFieldsContainer.querySelector('#interviewTerritorySelect');
+            const locationSelect = interviewFieldsContainer.querySelector('#interviewLocationSelect');
+            if (!territorySelect || !locationSelect) return;
+
+            populateTerritorySelect(territorySelect, cachedTerritories);
+
+            territorySelect.addEventListener('change', function() {
+                const territory = cachedTerritories.find(t => String(t.id) === String(territorySelect
+                    .value));
+                populateLocationSelect(locationSelect, territory);
+            });
+
+            if (currentApplicant && currentApplicant.territory_id) {
+                territorySelect.value = String(currentApplicant.territory_id);
+                const territory = cachedTerritories.find(t => String(t.id) === String(currentApplicant
+                    .territory_id));
+                populateLocationSelect(locationSelect, territory);
+                locationSelect.value = currentApplicant.location_id != null ? String(currentApplicant
+                    .location_id) : '';
+            }
+        }
+
+        function renderInterviewFields(fields, options) {
+            options = options || {};
             currentFields = fields ?? [];
-            interviewFieldsContainer.innerHTML = orderFieldsWithConditionalChildren(currentFields).map(renderField)
-                .join("");
+            const dynamicHtml = orderFieldsWithConditionalChildren(currentFields).map(renderField).join("");
+            interviewFieldsContainer.innerHTML = (options.includeTerritoryLocation ?
+                territoryLocationRowHtml() : '') + dynamicHtml;
             applyConditions();
+
+            if (options.includeTerritoryLocation) setupTerritoryLocationRow();
         }
 
         function getFieldContainer(fieldKey) {
@@ -1408,9 +1910,7 @@
             applyConditions();
         }
 
-        function buildInterviewFormData(outcome) {
-            const formData = new FormData();
-
+        function appendCurrentFieldsToFormData(formData) {
             currentFields.forEach(field => {
                 const container = getFieldContainer(field.field_key);
                 if (!container) return;
@@ -1418,7 +1918,8 @@
 
                 if (field.type === 'file') {
                     const input = container.querySelector('input[type="file"]');
-                    if (input && input.files.length) formData.append(`files[${field.field_key}]`, input.files[0]);
+                    if (input && input.files.length) formData.append(`files[${field.field_key}]`, input
+                        .files[0]);
                     return;
                 }
 
@@ -1436,8 +1937,19 @@
                 }
 
                 const input = container.querySelector('input, textarea, select');
-                if (input && input.value !== '') formData.append(`form_data[${field.field_key}]`, input.value);
+                if (input && input.value !== '') formData.append(`form_data[${field.field_key}]`, input
+                    .value);
             });
+        }
+
+        function buildInterviewFormData(outcome) {
+            const formData = new FormData();
+            appendCurrentFieldsToFormData(formData);
+
+            const territorySelect = interviewFieldsContainer.querySelector('#interviewTerritorySelect');
+            const locationSelect = interviewFieldsContainer.querySelector('#interviewLocationSelect');
+            if (territorySelect && territorySelect.value) formData.append('territory_id', territorySelect.value);
+            if (locationSelect && locationSelect.value) formData.append('location_id', locationSelect.value);
 
             formData.append('outcome', outcome);
             formData.append('_method', 'PATCH');
@@ -1445,8 +1957,79 @@
             return formData;
         }
 
+        // Used by the Edit Answers flow (interviewMode === 'edit') - answers
+        // only, no outcome/territory/location, PATCHes /answers instead of
+        // /interview.
+        function buildAnswersFormData() {
+            const formData = new FormData();
+            appendCurrentFieldsToFormData(formData);
+            formData.append('_method', 'PATCH');
+            return formData;
+        }
+
+        async function submitIncompleteInterview(button) {
+            const territorySelect = interviewFieldsContainer.querySelector('#interviewTerritorySelect');
+            const locationSelect = interviewFieldsContainer.querySelector('#interviewLocationSelect');
+
+            const formData = new FormData();
+            formData.append('incomplete', '1');
+            formData.append('_method', 'PATCH');
+            if (territorySelect && territorySelect.value) formData.append('territory_id', territorySelect
+                .value);
+            if (locationSelect && locationSelect.value) formData.append('location_id', locationSelect.value);
+
+            const res = await apiCall({
+                mode: 'POST',
+                isJson: false,
+                payload: formData,
+                url: `/api/applicants/${currentApplicantId}/interview`,
+                button
+            });
+
+            if (!res || res.success !== true) {
+                showMessage({
+                    status: 'error',
+                    title: 'Error',
+                    message: apiErrorMessage(res)
+                });
+                return;
+            }
+
+            closeSideModal('interviewApplicantSideModal');
+
+            showMessage({
+                status: 'success',
+                title: 'Applicant marked as rejected.'
+            });
+
+            await loadApplicant(currentApplicantId);
+            table.reload();
+        }
+
+        async function ensureFormFieldsLoaded() {
+            let fields = cachedFormFields;
+
+            if (!fields) {
+                const res = await apiCall({
+                    mode: 'GET',
+                    url: '/api/applicants/formConfig'
+                });
+
+                if (!res || res.success !== true) return null;
+
+                cachedFormFields = res.data.fields ?? [];
+                cachedTerritories = res.data.territories ?? cachedTerritories;
+                fields = cachedFormFields;
+            }
+
+            return fields;
+        }
+
         async function openInterviewModal() {
             if (!currentApplicantId) return;
+
+            interviewMode = 'interview';
+            submitInterviewBtn.textContent = 'Submit Interview';
 
             initSideModal({
                 modalId: 'interviewApplicantSideModal'
@@ -1456,30 +2039,57 @@
             interviewErrorEl.classList.add('hidden');
             interviewFormEl.classList.add('hidden');
 
-            let fields = cachedFormFields;
+            const fields = await ensureFormFieldsLoaded();
 
             if (!fields) {
-                const res = await apiCall({
-                    mode: 'GET',
-                    url: '/api/applicants/formConfig'
-                });
-
-                if (!res || res.success !== true) {
-                    interviewLoadingEl.classList.add('hidden');
-                    interviewErrorEl.classList.remove('hidden');
-                    return;
-                }
-
-                cachedFormFields = res.data.fields ?? [];
-                fields = cachedFormFields;
+                interviewLoadingEl.classList.add('hidden');
+                interviewErrorEl.classList.remove('hidden');
+                return;
             }
 
-            renderInterviewFields(fields);
+            renderInterviewFields(fields, {
+                includeTerritoryLocation: true
+            });
             prefillInterviewFields(buildAnswersMap(currentApplicant?.answers));
 
             interviewLoadingEl.classList.add('hidden');
             interviewFormEl.classList.remove('hidden');
         }
+
+        async function openEditAnswersModal() {
+            if (!currentApplicantId) return;
+
+            interviewMode = 'edit';
+            submitInterviewBtn.textContent = 'Save Answers';
+
+            initSideModal({
+                modalId: 'interviewApplicantSideModal'
+            });
+
+            interviewLoadingEl.classList.remove('hidden');
+            interviewErrorEl.classList.add('hidden');
+            interviewFormEl.classList.add('hidden');
+
+            const fields = await ensureFormFieldsLoaded();
+
+            if (!fields) {
+                interviewLoadingEl.classList.add('hidden');
+                interviewErrorEl.classList.remove('hidden');
+                return;
+            }
+
+            renderInterviewFields(fields, {
+                includeTerritoryLocation: false
+            });
+            prefillInterviewFields(buildAnswersMap(currentApplicant?.answers));
+
+            interviewLoadingEl.classList.add('hidden');
+            interviewFormEl.classList.remove('hidden');
+        }
+
+        btnEditAnswers.addEventListener('click', function() {
+            openEditAnswersModal();
+        });
 
         interviewModalEl.addEventListener('click', function(e) {
             const target = e.target;
@@ -1491,17 +2101,50 @@
             }
         });
 
-        submitInterviewBtn.addEventListener('click', function(e) {
+        submitInterviewBtn.addEventListener('click', async function(e) {
             e.preventDefault();
+
+            if (interviewMode === 'edit') {
+                const formData = buildAnswersFormData();
+
+                const res = await apiCall({
+                    mode: 'POST',
+                    isJson: false,
+                    payload: formData,
+                    url: `/api/applicants/${currentApplicantId}/answers`,
+                    button: this
+                });
+
+                if (!res || res.success !== true) {
+                    showMessage({
+                        status: 'error',
+                        title: 'Error',
+                        message: apiErrorMessage(res)
+                    });
+                    return;
+                }
+
+                closeSideModal('interviewApplicantSideModal');
+
+                showMessage({
+                    status: 'success',
+                    title: 'Answers saved'
+                });
+
+                await loadApplicant(currentApplicantId);
+                table.reload();
+                return;
+            }
 
             const missing = validateRequiredFields();
 
             if (missing.length) {
-                showMessage({
-                    status: 'error',
-                    title: 'Missing required fields',
-                    message: missing.join(', ') + ' required.'
-                });
+                const ok = await customConfirm(
+                    'This interview form is incomplete. Submit anyway? The applicant will be marked Rejected.'
+                );
+                if (!ok) return;
+
+                await submitIncompleteInterview(this);
                 return;
             }
 
@@ -1674,6 +2317,32 @@
             renderNotes();
         }
 
+        // ===================== ACTIVITY HISTORY =====================
+
+        const activityListEl = viewModalEl.querySelector('#activityList');
+
+        function activityRowHtml(entry) {
+            return `
+                <div class="py-2 border-b border-zinc-100 dark:border-zinc-800 last:border-0">
+                    <p class="text-sm text-zinc-800 dark:text-zinc-100">${entry.description}</p>
+                    <p class="text-xs text-zinc-400">— ${entry.actor_name ?? 'System'} · ${formatDate(entry.created_at)}</p>
+                </div>
+            `;
+        }
+
+        async function loadActivity(id) {
+            const res = await apiCall({
+                mode: 'GET',
+                url: `/api/applicants/${id}/activity`
+            });
+
+            const entries = (res && res.success === true && Array.isArray(res.data)) ? res.data : [];
+
+            activityListEl.innerHTML = entries.length ?
+                entries.map(activityRowHtml).join("") :
+                '<p class="text-sm text-zinc-400">No activity yet.</p>';
+        }
+
         btnAddNote.addEventListener('click', function() {
             noteInputEl.value = '';
             noteComposerEl.classList.remove('hidden');
@@ -1722,6 +2391,122 @@
 
             noteComposerEl.classList.add('hidden');
             noteInputEl.value = '';
+        });
+
+        // ===================== EXPORT =====================
+
+        const exportBtn = document.getElementById('btnExportApplicants');
+        const exportPanel = document.getElementById('exportPanel');
+        const exportFromInput = document.getElementById('exportFrom');
+        const exportToInput = document.getElementById('exportTo');
+        const exportStatusFilterEl = document.getElementById('exportStatusFilter');
+
+        function toISODateLocal(d) {
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d
+                .getDate()).padStart(2, '0');
+        }
+
+        function parseISODateLocal(s) {
+            if (!s) return null;
+            const parts = s.split('-');
+            if (parts.length !== 3) return null;
+            return new Date(+parts[0], +parts[1] - 1, +parts[2]);
+        }
+
+        function getMondayOfWeek(d) {
+            const day = (d.getDay() + 6) % 7;
+            const monday = new Date(d);
+            monday.setDate(d.getDate() - day);
+            return monday;
+        }
+
+        let exportCalendar = null;
+        if (typeof flatpickr === 'function') {
+            exportCalendar = flatpickr('#exportCalendar', {
+                mode: 'range',
+                inline: true,
+                dateFormat: 'Y-m-d',
+                onChange: function(selectedDates) {
+                    if (selectedDates.length >= 1) exportFromInput.value = toISODateLocal(selectedDates[
+                        0]);
+                    if (selectedDates.length === 2) exportToInput.value = toISODateLocal(selectedDates[
+                        1]);
+                }
+            });
+        }
+
+        function setExportRange(from, to) {
+            exportFromInput.value = toISODateLocal(from);
+            exportToInput.value = toISODateLocal(to);
+            if (exportCalendar) exportCalendar.setDate([from, to], false);
+        }
+
+        [exportFromInput, exportToInput].forEach(input => {
+            input.addEventListener('change', function() {
+                const from = parseISODateLocal(exportFromInput.value);
+                const to = parseISODateLocal(exportToInput.value);
+                if (exportCalendar && from && to) exportCalendar.setDate([from, to], false);
+            });
+        });
+
+        exportBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            exportPanel.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!exportPanel.classList.contains('hidden') && !exportPanel.contains(e.target) && e.target !==
+                exportBtn) {
+                exportPanel.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('exportPresetToday').addEventListener('click', function() {
+            const t = new Date();
+            setExportRange(t, t);
+        });
+
+        document.getElementById('exportPresetThisWeek').addEventListener('click', function() {
+            const monday = getMondayOfWeek(new Date());
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            setExportRange(monday, sunday);
+        });
+
+        document.getElementById('exportPresetLastWeek').addEventListener('click', function() {
+            const monday = getMondayOfWeek(new Date());
+            monday.setDate(monday.getDate() - 7);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            setExportRange(monday, sunday);
+        });
+
+        document.getElementById('exportRunBtn').addEventListener('click', function() {
+            const fmt = document.getElementById('exportFormat').value;
+            const from = exportFromInput.value;
+            const to = exportToInput.value;
+            const status = exportStatusFilterEl ?
+                Array.from(exportStatusFilterEl.querySelectorAll('.export-status-checkbox:checked'))
+                .map(cb => cb.value).join(',') : '';
+
+            if (!from) {
+                exportFromInput.focus();
+                return;
+            }
+            if (!to) {
+                exportToInput.focus();
+                return;
+            }
+
+            const scope = (scopeToggle && !scopeToggle.checked) ? 'mine' : 'team';
+
+            let url = '/api/applicants/export?format=' + encodeURIComponent(fmt) +
+                '&from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) +
+                '&scope=' + encodeURIComponent(scope);
+            if (status) url += '&status=' + encodeURIComponent(status);
+
+            window.location.href = url;
+            exportPanel.classList.add('hidden');
         });
     })();
 </script>

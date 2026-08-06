@@ -242,14 +242,11 @@ async function markAllRead() {
   refreshNotifications();
 }
 
-function formatTimestamp(isoString) {
-  const date = new Date(isoString);
-  return date.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+// The API sends created_at already formatted ("January 1, 2001" or
+// "January 1, 2001, 1:00 AM" - see App\Support\FriendlyDate) - just supply
+// the fallback, no re-parsing.
+function formatTimestamp(value) {
+  return value || "—";
 }
 
 function escapeHtml(str) {

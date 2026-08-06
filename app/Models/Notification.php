@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Casts\FriendlyDateTime;
+use App\Concerns\HasFriendlyDates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFriendlyDates;
 
     protected $table = 'notifications';
 
@@ -26,8 +28,8 @@ class Notification extends Model
     ];
 
     protected $casts = [
-        'created_at' => 'datetime:M d, Y, h:i A',
-        'updated_at' => 'datetime:M d, Y, h:i A',
+        'created_at' => FriendlyDateTime::class,
+        'updated_at' => FriendlyDateTime::class,
         'data' => 'array',
         'is_read' => 'boolean',
         'user_id' => 'integer',

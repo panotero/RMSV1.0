@@ -29,5 +29,12 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('isSuperAdmin', function ($user) {
             return RoleHelper::roleName($user) === 'superadmin';
         });
+
+        // Recruitment "App Settings" maintenance area (form builder, lookup
+        // lists, checklist groups) — matches the roles the App Settings nav
+        // item is configured to allow (nav_menus.allowed_roles).
+        Gate::define('manageAppSettings', function ($user) {
+            return in_array(RoleHelper::roleName($user), ['superadmin', 'admin', 'developer'], true);
+        });
     }
 }

@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use App\Casts\FriendlyDateTime;
+use App\Concerns\HasFriendlyDates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Applicant extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFriendlyDates;
 
     protected $fillable = [
         'full_name',
         'location_id',
+        'territory_id',
         'role_id',
         'source_id',
         'source_detail',
@@ -19,6 +22,7 @@ class Applicant extends Model
         'email',
         'date_of_birth',
         'interview_summary',
+        'interview_date',
         'status',
         'assigned_to',
         'team_id',
@@ -29,23 +33,30 @@ class Applicant extends Model
     ];
 
     protected $casts = [
-        'created_at' => 'datetime:M d, Y, h:i A',
-        'updated_at' => 'datetime:M d, Y, h:i A',
+        'created_at' => FriendlyDateTime::class,
+        'updated_at' => FriendlyDateTime::class,
         'form_data' => 'array',
         'form_version' => 'integer',
         'location_id' => 'integer',
+        'territory_id' => 'integer',
         'role_id' => 'integer',
         'source_id' => 'integer',
         'assigned_to' => 'integer',
         'team_id' => 'integer',
         'form_id' => 'integer',
-        'date_of_birth' => 'date',
-        'last_activity_at' => 'datetime',
+        'date_of_birth' => FriendlyDateTime::class,
+        'interview_date' => FriendlyDateTime::class,
+        'last_activity_at' => FriendlyDateTime::class,
     ];
 
     public function location()
     {
         return $this->belongsTo(LookupListItem::class, 'location_id');
+    }
+
+    public function territory()
+    {
+        return $this->belongsTo(LookupListItem::class, 'territory_id');
     }
 
     public function role()
@@ -91,6 +102,11 @@ class Applicant extends Model
     public function orientation()
     {
         return $this->hasOne(ApplicantOrientation::class, 'applicant_id');
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(ApplicantActivity::class, 'applicant_id');
     }
 
     /**

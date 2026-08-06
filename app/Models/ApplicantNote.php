@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Casts\FriendlyDateTime;
+use App\Concerns\HasFriendlyDates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ApplicantNote extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFriendlyDates;
 
     protected $fillable = [
         'applicant_id',
@@ -16,8 +18,8 @@ class ApplicantNote extends Model
     ];
 
     protected $casts = [
-        'created_at' => 'datetime:M d, Y, h:i A',
-        'updated_at' => 'datetime:M d, Y, h:i A',
+        'created_at' => FriendlyDateTime::class,
+        'updated_at' => FriendlyDateTime::class,
         'applicant_id' => 'integer',
         'created_by' => 'integer',
     ];

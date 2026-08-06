@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Casts\FriendlyDateTime;
+use App\Concerns\HasFriendlyDates;
 use Illuminate\Database\Eloquent\Model;
 
 class NavIcon extends Model
 {
+    use HasFriendlyDates;
+
     protected $fillable = [
         'key',
         'label',
@@ -13,7 +17,7 @@ class NavIcon extends Model
     ];
 
     protected $casts = [
-        'created_at' => 'datetime:M d, Y, h:i A',
-        'updated_at' => 'datetime:M d, Y, h:i A',
+        'created_at' => FriendlyDateTime::class,
+        'updated_at' => FriendlyDateTime::class,
     ];
 }

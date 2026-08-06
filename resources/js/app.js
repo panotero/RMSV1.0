@@ -16,6 +16,15 @@ import Alpine from "alpinejs";
 
 window.Alpine = Alpine;
 
+import Chart from "chart.js/auto";
+
+window.Chart = Chart;
+
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
+
+window.flatpickr = flatpickr;
+
 Alpine.start();
 import "./customFunctions";
 import "./datatableHandler";
